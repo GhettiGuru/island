@@ -60,7 +60,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose'             // Integration with activities
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose'
 
-    implementation 'eu.chainfire:libsuperuser:1.0.0.201704021214'
+    implementation 'eu.chainfire:libsuperuser:1.1.1'
     implementation 'uk.co.samuelwall:material-tap-target-prompt:2.0.1'
 
     implementation 'dev.rikka.shizuku:api:12.1.0'

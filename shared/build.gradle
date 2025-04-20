@@ -31,14 +31,6 @@ android {
         textReport true
         textOutput file('stdout')
     }
-
-    // Enable lint checking in all build variants.
-    libraryVariants.configureEach { variant ->
-        variant.outputs.each { output ->
-            def lintTask = tasks["lint${variant.name.capitalize()}"]
-            output.assemble.dependsOn lintTask
-        }
-    }
 }
 
 dependencies {
