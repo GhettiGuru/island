@@ -51,14 +51,15 @@ import kotlinx.coroutines.withContext
 		val entries = HashMap<String, AppInfoWithOps>()
 		// Apps with permission granted
 		activity.packageManager.getPackagesHoldingPermissions(arrayOf(permission), 0).forEach {
-			if (isUserAppOrUpdatedNonPrivilegeSystemApp(it.applicationInfo))
-				entries[it.packageName] = AppInfoWithOps(it.applicationInfo, it.packageName !in mOpsRevokedPkgs) }
+			val app = it.applicationInfo
+			if (app != null && isUserAppOrUpdatedNonPrivilegeSystemApp(app))
+				entries[it.packageName] = AppInfoWithOps(app, it.packageName !in mOpsRevokedPkgs) }
 		if (mCanceled) return@withContext null
 		// Frozen apps and apps with explicit app-op revoked
 		val apps = activity.packageManager.getInstalledPackages(GET_PERMISSIONS or MATCH_UNINSTALLED_PACKAGES)
 		if (mCanceled) return@withContext null
 		apps.forEach {
-			val pkg = it.packageName; val app = it.applicationInfo
+			val pkg = it.packageName; val app = it.applicationInfo ?: return@forEach
 			if (pkg !in entries && Apps.isInstalledInCurrentUser(app) && isUserAppOrUpdatedNonPrivilegeSystemApp(app)
 					&& (pkg in mOpsRevokedPkgs || it.requestedPermissions?.contains(permission) == true)) {
 				if (mCanceled) return@withContext null

@@ -110,14 +110,15 @@ import java.util.*
 
 		private fun startWatching(context: Context, info: PackageInfo) {
 			val watchingPermissions: ArrayList<String>?
-			if (info.requestedPermissions != null) {
+			val requestedPermissions = info.requestedPermissions
+			if (requestedPermissions != null) {
 				watchingPermissions = ArrayList()
-				for (i in info.requestedPermissions.indices) if (info.requestedPermissionsFlags[i] and PackageInfo.REQUESTED_PERMISSION_GRANTED == 0) {
-					val permission = info.requestedPermissions[i]
+				for (i in requestedPermissions.indices) if (info.requestedPermissionsFlags!![i] and PackageInfo.REQUESTED_PERMISSION_GRANTED == 0) {
+					val permission = requestedPermissions[i]
 					if (CONCERNED_PERMISSIONS.contains(permission)) watchingPermissions.add(permission)
 				}
 			} else watchingPermissions = null
-			val pkg = info.packageName; val appLabel = info.applicationInfo.loadLabel(context.packageManager)
+			val pkg = info.packageName; val appLabel = info.applicationInfo?.loadLabel(context.packageManager) ?: pkg
 			NotificationIds.IslandAppWatcher.post(context, pkg) {
 				buildShared(context, pkg, com.oasisfeng.island.shared.R.color.primary)
 				setContentTitle(context.getString(R.string.notification_app_watcher_title, appLabel)).setContentText(context.getText(R.string.notification_app_watcher_text))

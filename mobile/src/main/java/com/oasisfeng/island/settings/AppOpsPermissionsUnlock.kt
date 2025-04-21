@@ -43,8 +43,8 @@ class AppOpsPermissionsUnlock: BroadcastReceiver() {
 			context.packageManager.getInstalledPackages(GET_PERMISSIONS or MATCH_UNINSTALLED_PACKAGES).forEach { info ->
 				info.requestedPermissionsFlags?.forEachIndexed { i, flags ->
 					if (flags and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0) {
-						val permission = info.requestedPermissions[i]!!
-						try { unlock(policies, info.applicationInfo, permission) }
+						val permission = info.requestedPermissions!![i]!!
+						try { unlock(policies, info.applicationInfo!!, permission) }
 						catch (e: RuntimeException) { Log.e(TAG, "Error unlocking permission for ${info.packageName}: $permission") }}}}
 		}
 

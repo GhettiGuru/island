@@ -117,7 +117,7 @@ import com.oasisfeng.island.util.Users.Companion.isParentProfile
 				}
 			try {
 				val info = pm.getPackageInfo(pkg, 0)
-				var summary: String = info.versionName
+				var summary: String = info.versionName ?: info.versionCode.toString()
 				if (BuildConfig.DEBUG) {
 					val ago = System.currentTimeMillis() - info.lastUpdateTime
 					summary += " (${info.versionCode}, ${ago / 60_000} minutes ago)"

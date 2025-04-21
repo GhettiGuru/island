@@ -133,8 +133,8 @@ import com.oasisfeng.island.util.DevicePolicies.PreferredActivity
             onClick {
                 val pkgs = pm.getInstalledPackages(GET_PERMISSIONS or MATCH_UNINSTALLED_PACKAGES)
                         .filter { it.requestedPermissions?.contains(INTERACT_ACROSS_PROFILES) == true
-                                && it.applicationInfo.uid != Process.myUid() }  // Exclude extension pack
-                val entries = pkgs.map { it.applicationInfo.loadLabel(pm) }.toTypedArray()
+                                && (it.applicationInfo?.uid ?: 0) != Process.myUid() }  // Exclude extension pack
+                val entries = pkgs.map { it.applicationInfo?.loadLabel(pm) ?: it.packageName }.toTypedArray()
                 val allowedPackages: Set<String> = policies.invoke(DPM::getCrossProfilePackages)
                 val allowed = BooleanArray(entries.size) { index -> pkgs[index].packageName in allowedPackages }
                 Dialogs.buildCheckList(activity, activity.getText(R.string.prompt_manage_cross_profile_apps),

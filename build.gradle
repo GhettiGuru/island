@@ -27,6 +27,6 @@ allprojects {
         maven { url 'https://jitpack.io' }      // libsuperuser
     }
 
-    ext.compileSdkVersion = 34
+    ext.compileSdkVersion = 35
     ext.minSdkVersion = 24
 }
