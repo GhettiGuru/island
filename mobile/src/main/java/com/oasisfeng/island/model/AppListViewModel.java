@@ -63,7 +63,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * View model for apps
- *
+ * <p>
  * Created by Oasis on 2015/7/7.
  */
 @ParametersAreNonnullByDefault
@@ -175,7 +175,8 @@ public class AppListViewModel extends BaseAppListViewModel<AppViewModel> {
 		clearSelection();
 
 		IslandAppInfo.cacheLaunchableApps(requireNonNull(mAppListProvider.getContext()));	// Performance optimization
-		final List<AppViewModel> apps = mAppListProvider.installedApps(profile).filter(filters).map(AppViewModel::new).collect(toList());
+		final List<AppViewModel> apps = mAppListProvider.installedApps(profile).stream()
+				.filter(filters).map(AppViewModel::new).collect(toList());
 		IslandAppInfo.invalidateLaunchableAppsCache();
 		replaceApps(apps);
 

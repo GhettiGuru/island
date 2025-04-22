@@ -31,11 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Provider for installed apps
- *
+ * <p>
  * Created by Oasis on 2016/7/6.
  */
 public abstract class AppListProvider<T extends AppInfo> extends ContentProvider {
@@ -61,7 +60,7 @@ public abstract class AppListProvider<T extends AppInfo> extends ContentProvider
 		}
 	}
 
-	public Stream<T> installedAppsInOwnerUser() { return mAppMap.get().values().stream(); }
+	public Collection<T> installedAppsInOwnerUser() { return mAppMap.get().values(); }
 
 	public T get(final String pkg) { return mAppMap.get().get(pkg); }
 

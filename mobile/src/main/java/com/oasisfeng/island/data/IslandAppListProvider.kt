@@ -22,8 +22,6 @@ import com.oasisfeng.island.util.Users
 import com.oasisfeng.island.util.Users.Companion.isParentProfile
 import com.oasisfeng.island.util.Users.Companion.toId
 import java.util.function.Predicate
-import java.util.stream.Stream
-import kotlin.streams.asSequence
 
 /**
  * Island-specific [AppListProvider]
@@ -83,9 +81,8 @@ class IslandAppListProvider : AppListProvider<IslandAppInfo>() {
 		}
 	}
 
-	fun installedApps(profile: UserHandle): Stream<IslandAppInfo> {
-		return if (profile.isParentProfile()) installedAppsInOwnerUser() else loadAppsInProfileIfNotYet(profile).values.stream()
-	}
+	fun installedApps(profile: UserHandle): Collection<IslandAppInfo>
+	= if (profile.isParentProfile()) installedAppsInOwnerUser() else loadAppsInProfileIfNotYet(profile).values
 
 	private fun loadAppsInProfileIfNotYet(profile: UserHandle): Map<String, IslandAppInfo>
 	= if (! Users.isProfileManagedByIsland(context(), profile)) emptyMap() else mIslandAppMap.getOrPut(profile) { refresh(profile) }
@@ -96,7 +93,7 @@ class IslandAppListProvider : AppListProvider<IslandAppInfo>() {
 		mLauncherApps.registerCallback(mCallback)
 
 		context().registerReceiver(object : BroadcastReceiver() {
-			override fun onReceive(context: Context, intent: Intent) {
+			override fun onReceive(context: Context, intent: Intent) { @Suppress("DEPRECATION")
 				val profile = intent.getParcelableExtra<UserHandle>(EXTRA_USER) ?: return
 				Log.i(TAG, "Profile removed: ${profile.toId()}")
 				mIslandAppMap[profile]?.clear()

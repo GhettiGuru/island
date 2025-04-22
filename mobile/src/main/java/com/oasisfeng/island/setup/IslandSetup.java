@@ -145,7 +145,7 @@ public class IslandSetup {
 					try {
 						final DevicePolicies policies = new DevicePolicies(activity);
 						final AppListProvider<AppInfo> provider = AppListProvider.getInstance(activity);
-						final Stream<AppInfo> apps = provider.installedAppsInOwnerUser();
+						final Stream<AppInfo> apps = provider.installedAppsInOwnerUser().stream();
 
 						final List<String> frozen_pkgs = apps.filter(app -> app.isHidden()).map(app -> app.packageName).collect(toList());
 						for (final String pkg : frozen_pkgs)
@@ -219,4 +219,46 @@ public class IslandSetup {
 			showPromptForProfileManualRemoval(activity);
 		}
 	}
+//
+//	private static void activateManagedMainlandOrShowSetupGuide(final Activity activity, final int request_code) {
+//		//<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+//		//<root>
+//		//<profile-owner package="com.oasisfeng.island" name="" component="com.oasisfeng.island/com.oasisfeng.island.IslandDeviceAdminReceiver" userRestrictionsMigrated="true" />
+//		//</root>
+//		String content = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<device-owner package=\"" + Modules.MODULE_ENGINE + "\" />";
+//		final String admin_component = DeviceAdmins.getComponentName(activity).flattenToString();
+//		if (file.exists()) return;
+//		content += "<profile-owner package=\"" + Modules.MODULE_ENGINE + "\" name=\"Island\" userId=\"" + Users.toId(Users.profile)
+//					+ "\" component=\"" + admin_component + "\" />";
+//		content = content.replace("\"", "\\\"").replace("'", "\\'")
+//				.replace("<", "\\<").replace(">", "\\>");
+//
+//		final String file = new File(getDataSystemDirectory(), "device_owner.xml").getAbsolutePath();
+//		final String command = "echo " + content + " > " + file + " && chmod 600 " + file
+//				+ " && chown system:system " + file + " && dpm set-active-admin " + admin_component + " ; echo DONE";
+//		SafeAsyncTask.execute(activity, context -> Shell.SU.run(command), (context, output) -> {
+//			if (output == null || output.isEmpty()) {
+//				Toast.makeText(context, R.string.toast_setup_mainland_non_root, Toast.LENGTH_LONG).show();
+//				WebContent.view(context, Uri.parse(Config.URL_SETUP_MANAGED_MAINLAND.get()));
+//				return;
+//			}
+//			if (! "DONE".equals(output.get(output.size() - 1))) {
+//				Analytics.$().event("setup_mainland_root").with(CONTENT, String.join("\n", output)).send();
+//				Toast.makeText(context, R.string.toast_setup_mainland_root_failed, Toast.LENGTH_LONG).show();
+//				return;
+//			}
+//			Analytics.$().event("setup_mainland_root").with(CONTENT, output.size() == 1/* DONE */? null : String.join("\n", output)).send();
+//			// Start the device-admin activation UI (no-op if already activated with root above), since "dpm set-active-admin" is not supported on Android 5.0.
+//			activity.startActivityForResult(new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+//					.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, DeviceAdmins.getComponentName(context))
+//					.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, activity.getString(R.string.dialog_mainland_device_admin)), request_code);
+//			// Procedure is followed in onAddAdminResult().
+//		});
+//	}
+
+//	private static File getDataSystemDirectory() {
+//		if (Hacks.Environment_getDataSystemDirectory != null) return Hacks.Environment_getDataSystemDirectory.invoke().statically();
+//		final String data_path = System.getenv("ANDROID_DATA");
+//		return new File(data_path == null ? new File("/data") : new File(data_path), "system");
+//	}
 }
