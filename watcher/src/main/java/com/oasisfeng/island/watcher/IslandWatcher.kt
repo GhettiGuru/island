@@ -17,7 +17,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.LauncherApps
 import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
 import android.content.pm.PackageManager.DONT_KILL_APP
 import android.graphics.Bitmap
@@ -48,6 +47,7 @@ import com.oasisfeng.island.util.Users
 import com.oasisfeng.island.util.Users.Companion.ACTION_USER_INFO_CHANGED
 import com.oasisfeng.island.util.Users.Companion.EXTRA_USER_HANDLE
 import com.oasisfeng.island.util.Users.Companion.toId
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -72,13 +72,11 @@ import kotlinx.coroutines.launch
 			&& intent.getIntExtra(EXTRA_USER_HANDLE, Users.NULL_ID) != Users.currentId()) return
 		if (NotificationIds.IslandWatcher.isBlocked(context)) return
 
-		val unlocked = context.getSystemService<UserManager>()?.isUserUnlocked != false
-		val canDeactivate = if (SDK_INT >= Q) isParentProfileOwner(context)
-			else unlocked && context.getSystemService(LauncherApps::class.java)!!.hasShortcutHostPermission()   // hasShortcutHostPermission() below throws IllegalStateException: "User N is locked or not running"
-		val canRestart = unlocked && policies.isManagedProfile && ! policies.invoke(DPM::isUsingUnifiedPassword)
+		if (context.getSystemService<UserManager>()?.isUserUnlocked == false) return    // Not unlocked yet
+//		val canDeactivate = if (SDK_INT >= Q) isParentProfileOwner(context)
+//			else context.getSystemService(LauncherApps::class.java)!!.hasShortcutHostPermission()   // hasShortcutHostPermission() below throws IllegalStateException: "User N is locked or not running"
+		val canRestart = policies.isManagedProfile && ! policies.invoke(DPM::isUsingUnifiedPassword)
 				&& policies.manager.storageEncryptionStatus == ENCRYPTION_STATUS_ACTIVE_PER_USER
-		val needsManualDeactivate = unlocked && ! canDeactivate
-		if (! canDeactivate && ! canRestart && ! needsManualDeactivate) return
 
 		NotificationIds.IslandWatcher.post(context) {
 			setOngoing(true).setGroup(GROUP).setGroupSummary(true).setCategory(CATEGORY_STATUS).setVisibility(VISIBILITY_PUBLIC)
@@ -86,11 +84,10 @@ import kotlinx.coroutines.launch
 			setLargeIcon(Icon.createWithBitmap(getAppIcon(context)))
 			setColor(context.getColor(com.oasisfeng.island.shared.R.color.primary))
 			setContentTitle(context.getString(R.string.notification_island_watcher_title, IslandNameManager.getName(context)))
-			setContentText(context.getText(if (canDeactivate || ! canRestart) R.string.notification_island_watcher_text_for_deactivate
-				else R.string.notification_island_watcher_text_for_restart))
-			if (canDeactivate) addServiceAction(context, R.string.action_deactivate_island)
+			setContentText(context.getText(if (canRestart) R.string.notification_island_watcher_text_for_restart
+				else R.string.notification_island_watcher_text_for_deactivate))
 			if (canRestart) addServiceAction(context, R.string.action_restart_island, Intent.ACTION_REBOOT)
-			if (needsManualDeactivate) addServiceAction(context, R.string.action_deactivate_island_manually, Settings.ACTION_SYNC_SETTINGS)
+			addServiceAction(context, R.string.action_deactivate_island)
 			addAction(Notification.Action.Builder(null, context.getText(R.string.action_settings), PendingIntent.getActivity(context, 0,
 				NotificationIds.IslandWatcher.buildChannelSettingsIntent(context), FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)).build()) }
 	}
@@ -99,10 +96,6 @@ import kotlinx.coroutines.launch
 		addAction(Notification.Action.Builder(null, context.getText(label), PendingIntent.getService(context, 0,
 			Intent(context, IslandDeactivationService::class.java).setAction(action), FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)).build())
 	}
-
-	private fun isParentProfileOwner(context: Context) =
-		try { Shuttle(context, to = Users.parentProfile).invoke { DevicePolicies(this).isProfileOwner }}
-		catch (e: IllegalStateException) { false }
 
 	private fun getAppIcon(context: Context): Bitmap {
 		val size = context.resources.getDimensionPixelSize(android.R.dimen.app_icon_size)
@@ -114,23 +107,26 @@ import kotlinx.coroutines.launch
 
 	class IslandDeactivationService: Service() {
 
+		@OptIn(DelicateCoroutinesApi::class)
 		override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 			val action = intent?.action
 			if (action == Intent.ACTION_REBOOT) {
-				DevicePolicies(this).manager.lockNow(DevicePolicyManager.FLAG_EVICT_CREDENTIAL_ENCRYPTION_KEY) }
-			else if (action == Settings.ACTION_SYNC_SETTINGS)
-				try {
-					startActivity(Intent(Settings.ACTION_SYNC_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-					Toasts.showLong(applicationContext, R.string.toast_manual_quiet_mode) }
-				catch (_: ActivityNotFoundException) { Toasts.showLong(applicationContext, "Sorry, ROM is incompatible.") }
-			else if (SDK_INT >= Q) {
-				if (Users.isParentProfile()) {
+				DevicePolicies(this).manager.lockNow(DevicePolicyManager.FLAG_EVICT_CREDENTIAL_ENCRYPTION_KEY)
+			} else if (SDK_INT >= Q) {      // "Deactivate"
+				if (Users.isParentProfile()) { @Suppress("DEPRECATION")
 					intent?.getParcelableExtra<UserHandle>(Intent.EXTRA_USER)?.also { profile ->
 						GlobalScope.launch { requestQuietModeApi29(this@IslandDeactivationService, profile) }
-						return START_STICKY }}   // Still ongoing
-				else Shuttle(this, to = Users.parentProfile).launch(with = Users.current()) {
-					startService(Intent(this, IslandDeactivationService::class.java).putExtra(Intent.EXTRA_USER, it)) }}
-			else requestQuietMode(Users.current())
+						return START_STICKY }   // Still ongoing
+				} else {
+					if (isParentProfileOwner(this)) // The automatic way
+						Shuttle(this, to = Users.parentProfile).launch(with = Users.current()) {
+							startService(Intent(this, IslandDeactivationService::class.java).putExtra(Intent.EXTRA_USER, it)) }
+					else try {                              // The manual way
+						startActivity(Intent(Settings.ACTION_SYNC_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+						Toasts.showLong(applicationContext, R.string.toast_manual_quiet_mode) }
+					catch (_: ActivityNotFoundException) { Toasts.showLong(applicationContext, "Sorry, ROM is incompatible.") }
+				}
+			} else requestQuietMode(Users.current())
 			stopSelf()
 			return START_NOT_STICKY
 		}
@@ -141,7 +137,7 @@ import kotlinx.coroutines.launch
 			Log.i(TAG, "Preparing to deactivating Island (${profile.toId()})...")
 
 			val successful = HomeRole.runWithHomeRole(context) {
-				registerReceiver(object : BroadcastReceiver() { override fun onReceive(_c: Context, intent: Intent) { @Suppress("DEPRECATION")
+				registerReceiver(object : BroadcastReceiver() { override fun onReceive(c: Context, intent: Intent) { @Suppress("DEPRECATION")
 					val user = intent.getParcelableExtra<UserHandle>(Intent.EXTRA_USER)
 					if (user != profile) return
 
@@ -167,6 +163,10 @@ import kotlinx.coroutines.launch
 				startSystemSyncSettings().also { Log.d(TAG, "Error deactivating Island ${profile.toId()}", e) }}
 			finally { stopForeground(STOP_FOREGROUND_REMOVE) }
 		}
+
+		private fun isParentProfileOwner(context: Context) =
+			try { Shuttle(context, to = Users.parentProfile).invoke { DevicePolicies(this).isProfileOwner }}
+			catch (e: IllegalStateException) { false }
 
 		private fun startSystemSyncSettings() {
 			try {
