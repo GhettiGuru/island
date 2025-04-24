@@ -126,7 +126,7 @@
     <!-- General words -->
     <string name="open_settings">打开系统设置</string>
     <string name="prompt_invalid_input">输入无效</string>
-    <string name="prompt_island_not_ready">壶中界尚未就绪（已封印？）</string>
+    <string name="prompt_island_not_ready">壶中界尚未就绪（参见 设置-关于-常见问题）</string>
 
     <!-- Settings -->
 
@@ -202,8 +202,10 @@
 
     <string name="pref_about_header">关于</string>
     <string name="pref_about_version_title">版本</string>
+    <string name="pref_about_faq_title">常见问题</string>
+    <string name="pref_about_faq_summary">常见问题的可能解决方案（网页）</string>
     <string name="pref_about_open_source_title">这是一个开源项目</string>
-    <string name="pref_about_open_source_summary">欢迎来 GitHub 访问我们</string>
+    <string name="pref_about_open_source_summary">欢迎来 GitHub 访问我们（网页）</string>
     <string name="pref_about_beta">获取 Beta 测试版本</string>
     <string name="pref_about_beta_play_summary">加入 Play 商店 的测试渠道以获取 Beta 测试版本。</string>
     <string name="pref_about_beta_github_summary">在 GitHub 项目页面上设置 custome watch - release 以接收预发布（Beta）版本的通知。</string>
