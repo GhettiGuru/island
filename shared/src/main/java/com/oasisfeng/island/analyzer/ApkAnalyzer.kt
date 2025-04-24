@@ -75,7 +75,7 @@ object ApkAnalyzer {
 
 		return PackageInfo().apply {
 			packageName = meta.packageName
-			splitNames = split?.let { arrayOf(it) }
+			splitNames = split?.let { arrayOf(it) } ?: emptyArray()
 			versionName = meta.versionName; @Suppress("DEPRECATION")
 			versionCode = meta.versionCode.toInt()
 			if (SDK_INT >= P) longVersionCode = meta.versionCode
