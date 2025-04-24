@@ -8,6 +8,11 @@
 
   If TestDPC works flawlessly but Island does not, please [file an issue](https://github.com/oasisfeng/island/issues) with logcat attached for us to further analyze. If you are not familiar with logcat, please "Take bug report" in system "Settings - (System) - Developer options" and share the bug-report privately.
 
+- ## Error "Island is not ready" when performing some actions
+
+  This is normal if the Island space is paused (deactivated), since some actions require Island space being activated.
+
+  If you encounter this error otherwise and Island app is installed from Google Play Store, you need to install an [Extension Pack](https://github.com/oasisfeng/island/releases/tag/sideplay.v1.0) additionally. After the Extension Pack is installed, reboot your device and try again. **You may need to destroy and re-create the Island space to eliminate this error in some cases.**
 
 - ## Error in setup: "Oops! Couldn't set up your work profile. Contact your IT department or try again later."
 
