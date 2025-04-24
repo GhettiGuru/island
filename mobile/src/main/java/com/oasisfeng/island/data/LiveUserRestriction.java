@@ -14,6 +14,8 @@ import com.oasisfeng.island.util.Users;
 import androidx.lifecycle.LiveData;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import javax.annotation.Nullable;
+
 /**
  * {@link LiveData} for user restriction.
  *
@@ -23,15 +25,22 @@ public class LiveUserRestriction extends LiveData<Boolean> {
 
 	private static final String ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED = "android.app.action.DEVICE_POLICY_MANAGER_STATE_CHANGED";	// DevicePolicyManager.ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED
 
-	public LiveUserRestriction(final Context context, final String restriction, final UserHandle user) {
+	public static LiveUserRestriction create(final Context context, final String restriction, final UserHandle user) {
+		final LiveUserRestriction instance = new LiveUserRestriction(context, restriction, user);
+		return instance.query(context) != null ? instance : null;
+	}
+
+	private LiveUserRestriction(final Context context, final String restriction, final UserHandle user) {
 		mAppContext = context.getApplicationContext();
 		mRestriction = restriction;
 		mUser = user;
 	}
 
-	public boolean query(final Context context) {
-		final Bundle restrictions = ((UserManager) context.getSystemService(Context.USER_SERVICE)).getUserRestrictions(mUser);
-		return restrictions.containsKey(mRestriction);
+	public @Nullable Boolean query(final Context context) {
+		try {
+			final Bundle restrictions = ((UserManager) context.getSystemService(Context.USER_SERVICE)).getUserRestrictions(mUser);
+			return restrictions.containsKey(mRestriction);
+		} catch (SecurityException e) { return null; }
 	}
 
 	/** Request explicit update, in case broadcast receiver does not work (e.g. across users) */

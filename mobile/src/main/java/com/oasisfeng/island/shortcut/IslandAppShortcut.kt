@@ -326,6 +326,7 @@ class ShortcutsUpdater: BroadcastReceiver() {
 
 	override fun onReceive(context: Context, intent: Intent) {
 		if (SDK_INT >= O) try { // It's safe to not check the action, as the update is idempotent and does not depends on intent.
+			Users.refreshUsers(context)     // Ensure Users.parentProfile is initialized
 			val dynamic = Shuttle(context, to = Users.parentProfile).invokeNoThrows { IslandAppShortcut.isDynamicLabelEnabled(this) }
 				?: return Unit.also { Log.w(TAG, "Failed to query setting DynamicShortcutLabel across profile.") }
 			IslandAppShortcut.updateAll(context, dynamic)

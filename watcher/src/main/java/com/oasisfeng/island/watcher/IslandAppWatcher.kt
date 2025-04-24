@@ -14,6 +14,8 @@ import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import android.os.Build.VERSION_CODES.Q
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.ColorRes
 import androidx.annotation.RequiresApi
@@ -92,9 +94,11 @@ import java.util.*
 	/** This provider tracks all freezing and unfreezing events triggered by other modules within the default process of Island  */
 	class AppStateTracker : PseudoContentProvider() {
 
-		override fun onCreate() = false.also { ContextCompat.registerReceiver(context(), IslandAppWatcher(),
-			IntentFilter(DevicePolicies.ACTION_PACKAGE_UNFROZEN).apply { addAction(ACTION_PACKAGE_REMOVED); addDataScheme(("package")) },
-			RECEIVER_NOT_EXPORTED) }
+		override fun onCreate() = false.also { Handler(Looper.getMainLooper()).post {
+			ContextCompat.registerReceiver(context(), IslandAppWatcher(),
+			IntentFilter(DevicePolicies.ACTION_PACKAGE_UNFROZEN).apply {
+				addAction(ACTION_PACKAGE_REMOVED); addDataScheme(("package")) }, RECEIVER_NOT_EXPORTED)
+		}}
 	}
 
 	companion object {

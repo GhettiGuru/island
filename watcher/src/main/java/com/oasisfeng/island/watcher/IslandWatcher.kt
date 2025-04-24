@@ -118,7 +118,7 @@ import kotlinx.coroutines.launch
 						GlobalScope.launch { requestQuietModeApi29(this@IslandDeactivationService, profile) }
 						return START_STICKY }   // Still ongoing
 				} else {
-					if (isParentProfileOwner(this)) // The automatic way
+					if (isParentProfileOwner(this) == true) // The automatic way
 						Shuttle(this, to = Users.parentProfile).launch(with = Users.current()) {
 							startService(Intent(this, IslandDeactivationService::class.java).putExtra(Intent.EXTRA_USER, it)) }
 					else try {                              // The manual way
@@ -164,9 +164,8 @@ import kotlinx.coroutines.launch
 			finally { stopForeground(STOP_FOREGROUND_REMOVE) }
 		}
 
-		private fun isParentProfileOwner(context: Context) =
-			try { Shuttle(context, to = Users.parentProfile).invoke { DevicePolicies(this).isProfileOwner }}
-			catch (e: IllegalStateException) { false }
+		private fun isParentProfileOwner(context: Context)
+		= Shuttle(context, to = Users.parentProfile).invokeNoThrows { DevicePolicies(this).isProfileOwner }
 
 		private fun startSystemSyncSettings() {
 			try {
