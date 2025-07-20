@@ -41,9 +41,6 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Double check gradle wrapper
-        run: gradle wrapper # Ensures the gradlew script is present and up-to-date
-
       - name: Ensure Gradle wrapper is executable
         run: chmod +x gradlew # Grants execute permissions to gradlew
 
