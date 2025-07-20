@@ -56,8 +56,12 @@ jobs:
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build gradle project
-        run: ./gradlew build
+      - name: Run gradle tests (Packaging Flavor)
+        run: ./gradlew testPackagingDebug # Or testPackagingRelease, or testPackaging if an aggregate task exists
+        working-directory: island # Execute this command from the 'island' directory
+
+      - name: Build gradle project (Packaging Flavor)
+        run: ./gradlew buildPackaging # This will build all build types (Debug, Release) for the Packaging flavor
         working-directory: island # Execute this command from the 'island' directory
 
       - name: Build APK Debug - ${{ env.main_project_module }} (Packaging Flavor)
@@ -76,16 +80,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (Packaging)
-          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingDebug/ # Updated path for flavor
+          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingDebug/
 
       - name: Upload APK Release Artifact (Packaging Flavor)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (Packaging)
-          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingRelease/ # Updated path for flavor
+          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingRelease/
 
       - name: Upload AAB (App Bundle) Release Artifact (Packaging Flavor)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated (Packaging)
-          path: island/${{ env.main_project_module }}/build/outputs/bundle/packagingRelease/ # Updated path for flavor
+          path: island/${{ env.main_project_module }}/build/outputs/bundle/packagingRelease/
