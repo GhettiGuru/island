@@ -49,51 +49,47 @@ jobs:
 
       # These steps now run *after* Java 17 is set up
       - name: Ensure Gradle wrapper is executable
-        # Assuming gradlew is now in the 'island' directory
-        run: chmod +x island/gradlew
+        run: chmod +x gradlew
+        working-directory: island # Execute this command from the 'island' directory
 
       - name: Verify Gradle wrapper version
-        # Assuming gradlew is now in the 'island' directory
-        run: island/gradlew --version # This should now show Gradle 8.8 (or whatever you set)
-      - name:  Gradle Wrapper init
-        run:  ./island/gradle wrapper
+        run: ./gradlew --version
+        working-directory: island # Execute this command from the 'island' directory
+
       - name: Run gradle tests
-        # Assuming gradlew is now in the 'island' directory
-        run: island/gradlew test
+        run: ./gradlew test
+        working-directory: island # Execute this command from the 'island' directory
 
       - name: Build gradle project
-        # Assuming gradlew is now in the 'island' directory
-        run: island/gradlew build
+        run: ./gradlew build
+        working-directory: island # Execute this command from the 'island' directory
 
       - name: Build APK Debug - ${{ env.main_project_module }}
-        # Assuming gradlew is now in the 'island' directory
-        run: island/gradlew assembleDebug -PdisableAnalytics=true
+        run: ./gradlew assembleDebug -PdisableAnalytics=true
+        working-directory: island # Execute this command from the 'island' directory
 
       - name: Build app with analytics disabled (Release)
-        # Assuming gradlew is now in the 'island' directory
-        run: island/gradlew assembleRelease -PdisableAnalytics=true
+        run: ./gradlew assembleRelease -PdisableAnalytics=true
+        working-directory: island # Execute this command from the 'island' directory
 
       - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }}
-        # Assuming gradlew is now in the 'island' directory
-        run: island/gradlew ${{ env.main_project_module }}:bundleRelease
+        run: ./gradlew ${{ env.main_project_module }}:bundleRelease
+        working-directory: island # Execute this command from the 'island' directory
 
       - name: Upload APK Debug Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
-          # Path adjusted for 'island' directory
           path: island/${{ env.main_project_module }}/build/outputs/apk/debug/
 
       - name: Upload APK Release Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
-          # Path adjusted for 'island' directory
           path: island/${{ env.main_project_module }}/build/outputs/apk/release/
 
       - name: Upload AAB (App Bundle) Release Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
-          # Path adjusted for 'island' directory
           path: island/${{ env.main_project_module }}/build/outputs/bundle/release/
