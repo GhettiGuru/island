@@ -12,7 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    # Step 1: Checkout your main application repository
+    - name: Checkout main app repository
+      uses: actions/checkout@v4
+
+    # Step 2: Checkout the deagle repository into a 'deagle' folder
+    - name: Checkout deagle repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'oasisfeng/deagle' # Specifies the repository to clone
+        path: 'deagle'                # Specifies the directory to clone into
+
     - name: set up JDK 11
       uses: actions/setup-java@v4
       with:
@@ -21,6 +31,8 @@ jobs:
         cache: gradle
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      # This still refers to the gradlew in your main app's root directory
+      run: chmod +x gradlew 
     - name: Build with Gradle
+      # This still refers to the gradlew in your main app's root directory
       run: ./gradlew build
