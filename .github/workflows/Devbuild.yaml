@@ -71,15 +71,15 @@ jobs:
         run: find island/ -type f -name "*.apk"
 
       - name: Upload APK Debug Artifact (CompleteNormal Flavor)
-        uses: actions/upload-artifact@v4
         continue-on-error: true
+        uses: actions/upload-artifact@v4
         with:
           name: debug-apk-${{ env.date_today }}
           path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalDebug/*.apk
 
       - name: Upload APK Release Artifact (CompleteNormal Flavor)
-        uses: actions/upload-artifact@v4
         continue-on-error: true
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk-${{ env.date_today }}
           path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalRelease/*.apk
