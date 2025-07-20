@@ -55,10 +55,10 @@ jobs:
       - name: Verify Gradle wrapper version
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
-
-      - name: Build gradle project (CompleteNormal Flavor)
-        # This will build all build types (Debug, Release) for the CompleteNormal flavor combination
-        run: ./gradlew buildCompleteNormal
+ 
+      - name: Build gradle project (CompleteNormal Debug Flavor)
+        # Building the Debug build type for the CompleteNormal flavor combination
+        run: ./gradlew buildCompleteNormalDebug # Changed from buildCompleteNormal
         working-directory: island # Execute this command from the 'island' directory
 
       - name: Build APK Debug - ${{ env.main_project_module }} (CompleteNormal Flavor)
