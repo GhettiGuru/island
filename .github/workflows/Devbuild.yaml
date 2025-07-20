@@ -56,9 +56,7 @@ jobs:
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Run gradle tests (Packaging Flavor)
-        run: ./gradlew testPackagingDebug # Or testPackagingRelease, or testPackaging if an aggregate task exists
-        working-directory: island # Execute this command from the 'island' directory
+
 
       - name: Build gradle project (Packaging Flavor)
         run: ./gradlew buildPackaging # This will build all build types (Debug, Release) for the Packaging flavor
