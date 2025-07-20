@@ -56,8 +56,11 @@ jobs:
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
 
+      # Removed: Run gradle tests (CompleteNormal Debug Flavor)
+      # run: ./gradlew testCompleteNormalDebug
+
       - name: Build gradle project (CompleteNormal Debug Flavor)
-        run: ./gradlew buildCompleteNormalDebug -PdisableAnalytics=true
+        run: ./gradlew buildCompleteNormalDebug
         working-directory: island # Execute this command from the 'island' directory
 
       - name: Build APK Debug - ${{ env.main_project_module }} (CompleteNormal Flavor)
@@ -68,16 +71,23 @@ jobs:
         run: ./gradlew assembleCompleteNormalRelease -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
+      # Removed: Build App Bundle (AAB) Release - ${{ env.main_project_module }} (CompleteNormal Flavor)
+      # run: ./gradlew ${{ env.main_project_module }}:bundleCompleteNormalRelease
+
       - name: Upload APK Debug Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (CompleteNormal)
-          # Path adjusted: removed redundant '/debug'
-          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalDebug/
+          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalDebug/**/*
 
       - name: Upload APK Release Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (CompleteNormal)
-          # Path adjusted: removed redundant '/release'
-          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalRelease/
+          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalRelease/**/*
+
+      # Removed: Upload AAB (App Bundle) Release Artifact (CompleteNormal Flavor)
+      # uses: actions/upload-artifact@v4
+      # with:
+      #   name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated (CompleteNormal)
+      #   path: island/${{ env.main_project_module }}/build/outputs/bundle/completeNormalRelease/**/*
