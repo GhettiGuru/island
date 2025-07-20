@@ -56,10 +56,6 @@ jobs:
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Run gradle tests
-        run: ./gradlew test
-        working-directory: island # Execute this command from the 'island' directory
-
       - name: Build gradle project
         run: ./gradlew build
         working-directory: island # Execute this command from the 'island' directory
