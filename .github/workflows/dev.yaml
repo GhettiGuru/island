@@ -32,6 +32,15 @@ jobs:
       - name: Checkout main app code
         uses: actions/checkout@v4
 
+      # --- START OF ADDED SECTION (NOT RECOMMENDED PERMANENTLY) ---
+      - name: Update Gradle Wrapper to latest (Temporary/Testing)
+        run: |
+          chmod +x gradlew # Ensure gradlew is executable before running it
+          ./gradlew wrapper --gradle-version 8.8 --distribution-type bin # Specify a version that works with Java 17
+        # IMPORTANT: This change is NOT committed back to your repository.
+        # It only affects THIS specific workflow run.
+      # --- END OF ADDED SECTION ---
+
       - name: Set current date as env variable
         run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
@@ -44,6 +53,10 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
+
+      - name: Double check gradle wrapper
+        run: gradle wrapper # Ensures the gradlew script is present and up-to-date
+        # Note: If the above 'Update Gradle Wrapper' step ran, this will be redundant but harmless.
 
       - name: Ensure Gradle wrapper is executable
         run: chmod +x gradlew # Grants execute permissions to gradlew
