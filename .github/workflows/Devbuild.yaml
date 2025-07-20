@@ -1,17 +1,22 @@
 name: Android CI
 
+env:
+  main_project_module: app
+  playstore_name: Island
+
 on:
   push:
     branches:
-      - 'dev' # Only trigger on 'dev' branch pushes
+      - 'dev'
   pull_request:
     branches:
-      - 'dev' # Only trigger on 'dev' branch pull requests
-  workflow_dispatch: # Allows manual triggering
+      - 'dev'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Set environment variables for analytics
         run: echo "DISABLE_ANALYTICS=true" >> $GITHUB_ENV
@@ -21,15 +26,14 @@ jobs:
         with:
           repository: 'oasisfeng/deagle'
           path: 'deagle'
-          ref: 'dev' # Explicitly checkout the 'dev' branch of deagle
+          ref: 'dev'
 
       - name: Checkout main app code (dev branch)
         uses: actions/checkout@v4
         with:
-          path: 'island' # Checkout the main app into the 'island' folder
-          ref: 'dev' # Explicitly checkout the 'dev' branch of the main app repository
+          path: 'island'
+          ref: 'dev'
 
-      # IMPORTANT: Place Set Up JDK BEFORE any Gradle commands
       - name: Set Up JDK
         uses: actions/setup-java@v4
         with:
@@ -43,37 +47,39 @@ jobs:
       - name: Set repository name as env variable
         run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
 
-      # These steps now run *after* Java 17 is set up
       - name: Ensure Gradle wrapper is executable
         run: chmod +x gradlew
-        working-directory: island # Execute this command from the 'island' directory
+        working-directory: island
 
       - name: Verify Gradle wrapper version
         run: ./gradlew --version
-        working-directory: island # Execute this command from the 'island' directory
+        working-directory: island
 
       - name: Build gradle project (CompleteNormal Debug Flavor)
         run: ./gradlew buildCompleteNormalDebug
-        working-directory: island # Execute this command from the 'island' directory
+        working-directory: island
 
       - name: Build APK Debug - ${{ env.main_project_module }} (CompleteNormal Flavor)
         run: ./gradlew assembleCompleteNormalDebug -PdisableAnalytics=true
-        working-directory: island # Execute this command from the 'island' directory
+        working-directory: island
 
-      - name: Build app with analytics disabled (Release - CompleteNormal Flavor)
+      - name: Build APK Release - ${{ env.main_project_module }} (CompleteNormal Flavor)
         run: ./gradlew assembleCompleteNormalRelease -PdisableAnalytics=true
-        working-directory: island # Execute this command from the 'island' directory
+        working-directory: island
+
+      - name: Debug: List generated APKs
+        run: find island/ -type f -name "*.apk"
 
       - name: Upload APK Debug Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (CompleteNormal)
-          # Explicitly look for *.apk files directly in this directory
+          name: debug-apk-${{ env.date_today }}
           path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalDebug/*.apk
 
       - name: Upload APK Release Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (CompleteNormal)
-          # Explicitly look for *.apk files directly in this directory
+          name: release-apk-${{ env.date_today }}
           path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalRelease/*.apk
