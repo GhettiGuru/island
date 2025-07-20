@@ -55,10 +55,9 @@ jobs:
       - name: Verify Gradle wrapper version
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
- 
+
       - name: Build gradle project (CompleteNormal Debug Flavor)
-        # Building the Debug build type for the CompleteNormal flavor combination
-        run: ./gradlew buildCompleteNormalDebug # Changed from buildCompleteNormal
+        run: ./gradlew buildCompleteNormalDebug -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
       - name: Build APK Debug - ${{ env.main_project_module }} (CompleteNormal Flavor)
@@ -69,17 +68,16 @@ jobs:
         run: ./gradlew assembleCompleteNormalRelease -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
-
       - name: Upload APK Debug Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (CompleteNormal)
-          # Updated path for completeNormalDebug flavor combination
-          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormal/debug/
+          # Path adjusted: removed redundant '/debug'
+          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalDebug/
 
       - name: Upload APK Release Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (CompleteNormal)
-          # Updated path for completeNormalRelease flavor combination
-          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormal/release/
+          # Path adjusted: removed redundant '/release'
+          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormalRelease/
