@@ -7,12 +7,11 @@ env:
 on:
   push:
     branches:
-      - 'release/**'
-      - 'dev'
+      - 'dev' # Only trigger on 'dev' branch pushes
   pull_request:
     branches:
-      - 'dev'
-  workflow_dispatch:
+      - 'dev' # Only trigger on 'dev' branch pull requests
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   build:
@@ -20,16 +19,18 @@ jobs:
     steps:
       - name: Set environment variables for analytics
         run: echo "DISABLE_ANALYTICS=true" >> $GITHUB_ENV
-        
-      - name: Checkout deagle repository
+
+      - name: Checkout deagle repository (dev branch)
         uses: actions/checkout@v4
         with:
           repository: 'oasisfeng/deagle'
           path: 'deagle'
-          branches: 'dev'
-    
-      - name: Checkout main app code
+          ref: 'dev' # Explicitly checkout the 'dev' branch of deagle
+
+      - name: Checkout main app code (dev branch)
         uses: actions/checkout@v4
+        with:
+          ref: 'dev' # Explicitly checkout the 'dev' branch of the main app repository
 
       # IMPORTANT: Place Set Up JDK BEFORE any Gradle commands
       - name: Set Up JDK
@@ -44,7 +45,7 @@ jobs:
 
       - name: Set repository name as env variable
         run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
-      
+
       # These steps now run *after* Java 17 is set up
       - name: Ensure Gradle wrapper is executable
         run: chmod +x gradlew
