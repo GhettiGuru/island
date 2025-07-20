@@ -56,38 +56,40 @@ jobs:
         run: ./gradlew --version
         working-directory: island # Execute this command from the 'island' directory
 
-
-
-      - name: Build gradle project (Packaging Flavor)
-        run: ./gradlew buildPackaging # This will build all build types (Debug, Release) for the Packaging flavor
+      - name: Build gradle project (CompleteNormal Flavor)
+        # This will build all build types (Debug, Release) for the CompleteNormal flavor combination
+        run: ./gradlew buildCompleteNormal
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build APK Debug - ${{ env.main_project_module }} (Packaging Flavor)
-        run: ./gradlew assemblePackagingDebug -PdisableAnalytics=true
+      - name: Build APK Debug - ${{ env.main_project_module }} (CompleteNormal Flavor)
+        run: ./gradlew assembleCompleteNormalDebug -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build app with analytics disabled (Release - Packaging Flavor)
-        run: ./gradlew assemblePackagingRelease -PdisableAnalytics=true
+      - name: Build app with analytics disabled (Release - CompleteNormal Flavor)
+        run: ./gradlew assembleCompleteNormalRelease -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }} (Packaging Flavor)
-        run: ./gradlew ${{ env.main_project_module }}:bundlePackagingRelease
+      - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }} (CompleteNormal Flavor)
+        run: ./gradlew ${{ env.main_project_module }}:bundleCompleteNormalRelease
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Upload APK Debug Artifact (Packaging Flavor)
+      - name: Upload APK Debug Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (Packaging)
-          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingDebug/
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (CompleteNormal)
+          # Updated path for completeNormalDebug flavor combination
+          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormal/debug/
 
-      - name: Upload APK Release Artifact (Packaging Flavor)
+      - name: Upload APK Release Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (Packaging)
-          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingRelease/
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (CompleteNormal)
+          # Updated path for completeNormalRelease flavor combination
+          path: island/${{ env.main_project_module }}/build/outputs/apk/completeNormal/release/
 
-      - name: Upload AAB (App Bundle) Release Artifact (Packaging Flavor)
+      - name: Upload AAB (App Bundle) Release Artifact (CompleteNormal Flavor)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated (Packaging)
-          path: island/${{ env.main_project_module }}/build/outputs/bundle/packagingRelease/
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated (CompleteNormal)
+          # Updated path for completeNormalRelease flavor combination
+          path: island/${{ env.main_project_module }}/build/outputs/bundle/completeNormalRelease/
