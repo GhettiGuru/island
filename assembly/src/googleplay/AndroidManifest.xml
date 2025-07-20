@@ -1,8 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- These permissions are disallowed on Google Play Store -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_PROFILES" tools:node="remove" />
 <activity
     android:name="com.oasisfeng.island.MainActivity"
     android:exported="true"
@@ -13,4 +9,8 @@
     </intent-filter>
     <!-- Other intent filters if any -->
 </activity>
+    <!-- These permissions are disallowed on Google Play Store -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_PROFILES" tools:node="remove" />
+
 </manifest>
