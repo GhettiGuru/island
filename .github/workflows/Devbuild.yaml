@@ -64,32 +64,32 @@ jobs:
         run: ./gradlew build
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build APK Debug - ${{ env.main_project_module }}
-        run: ./gradlew assembleDebug -PdisableAnalytics=true
+      - name: Build APK Debug - ${{ env.main_project_module }} (Packaging Flavor)
+        run: ./gradlew assemblePackagingDebug -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build app with analytics disabled (Release)
-        run: ./gradlew assembleRelease -PdisableAnalytics=true
+      - name: Build app with analytics disabled (Release - Packaging Flavor)
+        run: ./gradlew assemblePackagingRelease -PdisableAnalytics=true
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }}
-        run: ./gradlew ${{ env.main_project_module }}:bundleRelease
+      - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }} (Packaging Flavor)
+        run: ./gradlew ${{ env.main_project_module }}:bundlePackagingRelease
         working-directory: island # Execute this command from the 'island' directory
 
-      - name: Upload APK Debug Artifact
+      - name: Upload APK Debug Artifact (Packaging Flavor)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
-          path: island/${{ env.main_project_module }}/build/outputs/apk/debug/
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated (Packaging)
+          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingDebug/ # Updated path for flavor
 
-      - name: Upload APK Release Artifact
+      - name: Upload APK Release Artifact (Packaging Flavor)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
-          path: island/${{ env.main_project_module }}/build/outputs/apk/release/
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated (Packaging)
+          path: island/${{ env.main_project_module }}/build/outputs/apk/packagingRelease/ # Updated path for flavor
 
-      - name: Upload AAB (App Bundle) Release Artifact
+      - name: Upload AAB (App Bundle) Release Artifact (Packaging Flavor)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
-          path: island/${{ env.main_project_module }}/build/outputs/bundle/release/
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated (Packaging)
+          path: island/${{ env.main_project_module }}/build/outputs/bundle/packagingRelease/ # Updated path for flavor
