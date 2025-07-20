@@ -1,38 +1,84 @@
 name: Android CI
 
+env:
+  main_project_module: app
+  playstore_name: Island
+
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - 'release/**' # Matches branches like 'release/v1.0', 'release/bugfix' etc.
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    # Step 1: Checkout your main application repository
-    - name: Checkout main app repository
-      uses: actions/checkout@v4
+      - name: Set environment variables for analytics
+        run: echo "DISABLE_ANALYTICS=true" >> $GITHUB_ENV
+        
+      # Step 1: Checkout the deagle repository into a 'deagle' folder
+      - name: Checkout deagle repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'oasisfeng/deagle' # Specifies the repository to clone
+          path: 'deagle'                # Specifies the directory to clone into
 
-    # Step 2: Checkout the deagle repository into a 'deagle' folder
-    - name: Checkout deagle repository
-      uses: actions/checkout@v4
-      with:
-        repository: 'oasisfeng/deagle' # Specifies the repository to clone
-        path: 'deagle'                # Specifies the directory to clone into
+      # Step 2: Checkout the main application repository (the one this workflow is in)
+      - name: Checkout main app code
+        uses: actions/checkout@v4
 
-    - name: set up JDK 11
-      uses: actions/setup-java@v4
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set current date as env variable
+        run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - name: Grant execute permission for gradlew
-      # This still refers to the gradlew in your main app's root directory
-      run: chmod +x gradlew 
-    - name: Build with Gradle
-      # This still refers to the gradlew in your main app's root directory
-      run: ./gradlew build
+      - name: Set repository name as env variable
+        run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+      
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Double check gradle wrapper
+        run: gradle wrapper # Ensures the gradlew script is present and up-to-date
+
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x gradlew # Grants execute permissions to gradlew
+
+      - name: Verify Gradle wrapper version
+        run: ./gradlew --version # Confirms gradlew is working
+
+      - name: Run gradle tests
+        run: ./gradlew test
+
+      - name: Build gradle project
+        run: ./gradlew build
+
+      - name: Build APK Debug - ${{ env.main_project_module }}
+        run: ./gradlew assembleDebug -PdisableAnalytics=true
+
+      - name: Build app with analytics disabled (Release)
+        run: ./gradlew assembleRelease -PdisableAnalytics=true
+
+      - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }}
+        run: ./gradlew ${{ env.main_project_module }}:bundleRelease
+
+      - name: Upload APK Debug Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
+          path: ${{ env.main_project_module }}/build/outputs/apk/debug/
+
+      - name: Upload APK Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
+          path: ${{ env.main_project_module }}/build/outputs/apk/release/
+
+      - name: Upload AAB (App Bundle) Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
+          path: ${{ env.main_project_module }}/build/outputs/bundle/release/
