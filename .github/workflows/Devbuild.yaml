@@ -30,6 +30,7 @@ jobs:
       - name: Checkout main app code (dev branch)
         uses: actions/checkout@v4
         with:
+          path: 'island' # Checkout the main app into the 'island' folder
           ref: 'dev' # Explicitly checkout the 'dev' branch of the main app repository
 
       # IMPORTANT: Place Set Up JDK BEFORE any Gradle commands
@@ -48,40 +49,50 @@ jobs:
 
       # These steps now run *after* Java 17 is set up
       - name: Ensure Gradle wrapper is executable
-        run: chmod +x gradlew
+        # Assuming gradlew is now in the 'island' directory
+        run: chmod +x island/gradlew
 
       - name: Verify Gradle wrapper version
-        run: ./gradlew --version # This should now show Gradle 8.8 (or whatever you set)
+        # Assuming gradlew is now in the 'island' directory
+        run: island/gradlew --version # This should now show Gradle 8.8 (or whatever you set)
 
       - name: Run gradle tests
-        run: ./gradlew test
+        # Assuming gradlew is now in the 'island' directory
+        run: island/gradlew test
 
       - name: Build gradle project
-        run: ./gradlew build
+        # Assuming gradlew is now in the 'island' directory
+        run: island/gradlew build
 
       - name: Build APK Debug - ${{ env.main_project_module }}
-        run: ./gradlew assembleDebug -PdisableAnalytics=true
+        # Assuming gradlew is now in the 'island' directory
+        run: island/gradlew assembleDebug -PdisableAnalytics=true
 
       - name: Build app with analytics disabled (Release)
-        run: ./gradlew assembleRelease -PdisableAnalytics=true
+        # Assuming gradlew is now in the 'island' directory
+        run: island/gradlew assembleRelease -PdisableAnalytics=true
 
       - name: Build App Bundle (AAB) Release - ${{ env.main_project_module }}
-        run: ./gradlew ${{ env.main_project_module }}:bundleRelease
+        # Assuming gradlew is now in the 'island' directory
+        run: island/gradlew ${{ env.main_project_module }}:bundleRelease
 
       - name: Upload APK Debug Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
-          path: ${{ env.main_project_module }}/build/outputs/apk/debug/
+          # Path adjusted for 'island' directory
+          path: island/${{ env.main_project_module }}/build/outputs/apk/debug/
 
       - name: Upload APK Release Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
-          path: ${{ env.main_project_module }}/build/outputs/apk/release/
+          # Path adjusted for 'island' directory
+          path: island/${{ env.main_project_module }}/build/outputs/apk/release/
 
       - name: Upload AAB (App Bundle) Release Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
-          path: ${{ env.main_project_module }}/build/outputs/bundle/release/
+          # Path adjusted for 'island' directory
+          path: island/${{ env.main_project_module }}/build/outputs/bundle/release/
