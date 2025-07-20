@@ -56,7 +56,7 @@ jobs:
         # Assuming gradlew is now in the 'island' directory
         run: island/gradlew --version # This should now show Gradle 8.8 (or whatever you set)
       - name:  Gradle Wrapper init
-        run:  /island/gradle wrapper
+        run:  ./island/gradle wrapper
       - name: Run gradle tests
         # Assuming gradlew is now in the 'island' directory
         run: island/gradlew test
