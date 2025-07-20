@@ -3,5 +3,14 @@
     <!-- These permissions are disallowed on Google Play Store -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_PROFILES" tools:node="remove" />
-
+<activity
+    android:name="com.oasisfeng.island.MainActivity"
+    android:exported="true"
+    android:theme="@style/AppTheme.NoActionBar">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+    <!-- Other intent filters if any -->
+</activity>
 </manifest>
