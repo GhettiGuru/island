@@ -6,7 +6,12 @@ env:
 
 on:
   push:
-   branches: [ "dev" ]
+    branches:
+      - 'release/**' # Existing: Matches branches like 'release/v1.0', 'release/bugfix' etc.
+      - 'dev'        # New: Trigger on pushes to the 'dev' branch
+  pull_request:
+    branches:
+      - 'dev'        # New: Trigger on pull requests targeting the 'dev' branch
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
