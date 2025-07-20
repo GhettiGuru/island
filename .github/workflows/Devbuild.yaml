@@ -26,7 +26,8 @@ jobs:
         with:
           repository: 'oasisfeng/deagle'
           path: 'deagle'
-
+          branches: 'dev'
+    
       - name: Checkout main app code
         uses: actions/checkout@v4
 
