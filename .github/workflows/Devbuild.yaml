@@ -59,13 +59,28 @@ jobs:
         run: ./gradlew buildCompleteNormalDebug
         working-directory: island
 
+      - name: Decode Keystore from secret
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
+          echo "KEYSTORE_PATH=$(pwd)/keystore.jks" >> $GITHUB_ENV
+
+      - name: Build APK Release - CompleteNormal
+        run: ./gradlew assembleCompleteNormalRelease -PdisableAnalytics=true
+        working-directory: island
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          
+
       - name: Build APK Debug - ${{ env.main_project_module }} (CompleteNormal Flavor)
         run: ./gradlew assembleCompleteNormalDebug -PdisableAnalytics=true
         working-directory: island
-
-      - name: Build APK Release - ${{ env.main_project_module }} (CompleteNormal Flavor)
-        run: ./gradlew assembleCompleteNormalRelease -PdisableAnalytics=true
-        working-directory: island
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          
 
       - name: Verify Artifacts Path
         run: find island/ -type f -name "*.apk"
