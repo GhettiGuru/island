@@ -4,17 +4,9 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     namespace 'com.oasisfeng.island'
-
     compileSdk this.compileSdkVersion
 
-    defaultConfig {
-        applicationId "com.oasisfeng.island"
-        minSdkVersion this.minSdkVersion
-        targetSdkVersion 34
-        resourceConfigurations += ['en', 'zh', 'zh-rTW', 'pt-rBR']
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-  
-        signingConfigs {
+    signingConfigs {
         release {
             storeFile file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks")
             storePassword System.getenv("KEYSTORE_PASSWORD")
@@ -22,18 +14,31 @@ android {
             keyPassword System.getenv("KEY_PASSWORD")
         }
     }
-    
+
+    defaultConfig {
+        applicationId "com.oasisfeng.island"
+        minSdkVersion this.minSdkVersion
+        targetSdkVersion 34
+        resourceConfigurations += ['en', 'zh', 'zh-rTW', 'pt-rBR']
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
     buildFeatures.dataBinding true
 
     buildTypes {
         debug {
+            signingConfig signingConfigs.release  // ✅ Signed debug
             firebaseCrashlytics.mappingFileUploadEnabled false
         }
         release {
+            signingConfig signingConfigs.release  // ✅ Signed release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    // ... (your flavorDimensions, productFlavors, compileOptions, etc.)
+}
 
     flavorDimensions += "packaging"
     flavorDimensions += "distribution"
