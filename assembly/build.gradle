@@ -12,6 +12,12 @@ android {
             storePassword System.getenv("KEYSTORE_PASSWORD")
             keyAlias System.getenv("KEY_ALIAS")
             keyPassword System.getenv("KEY_PASSWORD")
+
+            // Enable only v1 and v3 signing
+            enableV1Signing true
+            enableV2Signing false
+            enableV3Signing true
+            enableV4Signing false
         }
     }
 
@@ -33,11 +39,28 @@ android {
             firebaseCrashlytics {
                 mappingFileUploadEnabled false
             }
+
+            // Also override signing scheme here for debug explicitly if needed
+            signingConfig {
+                enableV1Signing true
+                enableV2Signing false
+                enableV3Signing true
+                enableV4Signing false
+            }
         }
+
         release {
-            signingConfig signingConfigs.release  // ✅ Signed release
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // Redundant here, already inherited from signingConfigs.release
+            signingConfig {
+                enableV1Signing true
+                enableV2Signing false
+                enableV3Signing true
+                enableV4Signing false
+            }
         }
     }
 
