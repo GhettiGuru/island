@@ -23,12 +23,16 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
-    buildFeatures.dataBinding true
+    buildFeatures {
+        dataBinding true
+    }
 
     buildTypes {
         debug {
             signingConfig signingConfigs.release  // ✅ Signed debug
-            firebaseCrashlytics.mappingFileUploadEnabled false
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
         }
         release {
             signingConfig signingConfigs.release  // ✅ Signed release
@@ -36,20 +40,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-}
-    // ... (your flavorDimensions, productFlavors, compileOptions, etc.)
-}
 
-    flavorDimensions += "packaging"
-    flavorDimensions += "distribution"
+    flavorDimensions "packaging", "distribution"
 
     productFlavors {
-        complete { dimension "packaging" }
-        engine   { dimension "packaging" }  // Share application ID to retain the profile ownership when switching builds
-        mobile   { dimension "packaging"; applicationIdSuffix ".mobile" }
+        complete {
+            dimension "packaging"
+        }
+        engine {
+            dimension "packaging"
+        }
+        mobile {
+            dimension "packaging"
+            applicationIdSuffix ".mobile"
+        }
 
-        normal     { dimension "distribution" }
-        googleplay { dimension "distribution" }
+        normal {
+            dimension "distribution"
+        }
+        googleplay {
+            dimension "distribution"
+        }
     }
 
     compileOptions {
@@ -57,7 +68,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    lint {
+    lintOptions {
         checkOnly 'NewApi'
         abortOnError true
         checkReleaseBuilds false
@@ -67,8 +78,10 @@ android {
         textOutput file('stdout')
     }
 
-    repositories.flatDir {
-        dirs '../app/libs'
+    repositories {
+        flatDir {
+            dirs '../app/libs'
+        }
     }
 }
 
@@ -80,10 +93,9 @@ dependencies {
     completeImplementation project(':watcher')
     completeImplementation project(':open')
 
-    //debugImplementation project(':media')
-
     // Engine only
     engineImplementation project(':engine')
+
     // Mobile only
     mobileImplementation project(':mobile')
 }
