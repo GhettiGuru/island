@@ -13,8 +13,16 @@ android {
         targetSdkVersion 34
         resourceConfigurations += ['en', 'zh', 'zh-rTW', 'pt-rBR']
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+  
+        signingConfigs {
+        release {
+            storeFile file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
     }
-
+    
     buildFeatures.dataBinding true
 
     buildTypes {
