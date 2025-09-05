@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -211,6 +211,7 @@ class CrossProfileIntentFiltersHelper {
 		capture.addAction(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
 		capture.addAction(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE);
 		capture.addAction(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
+		capture.addAction(Intent.ACTION_CAMERA_BUTTON);
 		capture.addCategory(Intent.CATEGORY_DEFAULT);
 		pm.addCrossProfileIntentFilter(capture, managedProfileUserId, parentUserId, 0);
 
