@@ -228,10 +228,6 @@ class CrossProfileIntentFiltersHelper {
         
         // Categories
         capture.addCategory(Intent.CATEGORY_DEFAULT);
-        capture.addCategory(Intent.CATEGORY_CAMERA);
-        capture.addCategory(Intent.CATEGORY_APP_CAMERA);
-        capture.addCategory(Intent.CATEGORY_LAUNCHER);
-        
         // Data types
         try {
             capture.addDataType("image/*");
