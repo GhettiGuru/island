@@ -3,6 +3,9 @@
 
     <uses-feature android:name="android.software.device_admin" android:required="true" />
     <uses-feature android:name="android.software.managed_users" android:required="true" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <permission-group android:name="${applicationId}.permission-group.PACKAGE_ACCESS"
                       android:label="@string/permission_group_control_island_apps_label"
@@ -27,16 +30,19 @@
                 android:label="@string/permission_suspend_app_label"
                 android:description="@string/permission_suspend_app_description" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- IslandProvisioning & ShuttleKeeper, required if targeting API 28+ -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" /> <!-- Required to start ACTION_INSTALL_PACKAGE since Android O -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> <!-- ShuttleProvider -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" /> <!-- TBD -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECORD_VIDEO" />
 
     <application android:label="Island - Engine" tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
 
@@ -56,7 +62,7 @@
                 <action android:name="com.oasisfeng.island.action.UNSUSPEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="package" />
-                <data android:scheme="packages" /> <!-- ssp: comma-separated package names -->
+                <data android:scheme="packages" />
             </intent-filter>
         </activity>
 
@@ -82,14 +88,26 @@
                 <action android:name="com.oasisfeng.island.action.UNSUSPEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="package" />
-                <data android:scheme="packages" /> <!-- ssp: comma-separated package names -->
+                <data android:scheme="packages" />
             </intent-filter>
         </receiver>
 
         <service android:name="com.oasisfeng.island.service.IslandPersistentService"
-                 android:permission="android.permission.BIND_DEVICE_ADMIN" android:exported="true" tools:targetApi="26">
+                 android:permission="android.permission.BIND_DEVICE_ADMIN" 
+                 android:exported="true" 
+                 tools:targetApi="26">
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_SERVICE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.oasisfeng.island.action.INTERCEPT_CAMERA" />
+                <action android:name="android.intent.action.CAMERA_BUTTON" />
+                <action android:name="android.media.action.IMAGE_CAPTURE" />
+                <action android:name="android.media.action.VIDEO_CAPTURE" />
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+                <action android:name="android.provider.MediaStore.ACTION_IMAGE_CAPTURE" />
+                <action android:name="android.provider.MediaStore.ACTION_VIDEO_CAPTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
 
@@ -101,7 +119,7 @@
                  android:foregroundServiceType="shortService"
                  android:directBootAware="true">
             <intent-filter>
-                <action android:name="android.app.action.PROVISION_MANAGED_PROFILE" /> <!-- For re-provisioning procedure, see IslandSettingsFragment -->
+                <action android:name="android.app.action.PROVISION_MANAGED_PROFILE" />
                 <action android:name="android.app.action.PROVISION_MANAGED_DEVICE" />
             </intent-filter>
         </service>
@@ -126,7 +144,7 @@
         </receiver>
 
         <receiver android:name="com.oasisfeng.island.provisioning.ManualProvisioningReceiver" android:exported="false" android:directBootAware="true">
-            <intent-filter android:priority="9999"> <!-- High priority to ensure being executed as early as possible -->
+            <intent-filter android:priority="9999">
                 <action android:name="android.intent.action.USER_INITIALIZE" />
                 <action android:name="android.app.action.DEVICE_OWNER_CHANGED" />
             </intent-filter>
