@@ -1,4 +1,4 @@
-name: Android CI testing
+name: Android testing
 
 env:
   main_project_module: app
