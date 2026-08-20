@@ -1,4 +1,5 @@
-name: Android testing
+
+name: Android test
 
 env:
   main_project_module: app
