@@ -1,7 +1,7 @@
 Run details
 Workflow file for this run
 .github/workflows/CI_Build.yaml at 71d28db
-name: Android CI Test
+name: Android CI Test build
 
 env:
   main_project_module: app
